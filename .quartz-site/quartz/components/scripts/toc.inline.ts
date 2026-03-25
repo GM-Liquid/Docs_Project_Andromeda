@@ -111,7 +111,7 @@ function setupToc() {
   const desktopToc = desktopSidebar?.querySelector(".toc.desktop-only")
 
   if (desktopSidebar && drawerToggle && desktopToc) {
-    setTocDrawerExpanded(desktopSidebar, false)
+    setTocDrawerExpanded(desktopSidebar, true)
     drawerToggle.addEventListener("click", toggleTocDrawer)
     window.addCleanup(() => drawerToggle.removeEventListener("click", toggleTocDrawer))
   }
