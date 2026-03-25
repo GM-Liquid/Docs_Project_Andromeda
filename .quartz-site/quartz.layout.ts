@@ -1,6 +1,5 @@
 import { PageLayout, SharedLayout } from "./quartz/cfg"
 import * as Component from "./quartz/components"
-import HoverToc from "./quartz/components/HoverToc"
 import SiteHeader from "./quartz/components/SiteHeader"
 
 // components shared across all pages
@@ -23,7 +22,7 @@ export const defaultContentPageLayout: PageLayout = {
     Component.MobileOnly(Component.TableOfContents()),
   ],
   left: [
-    Component.DesktopOnly(HoverToc()),
+    Component.DesktopOnly(Component.TableOfContents()),
   ],
   right: [
     Component.DesktopOnly(SiteHeader({ variant: "sidebar" })),
