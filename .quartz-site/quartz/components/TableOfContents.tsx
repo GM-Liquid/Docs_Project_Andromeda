@@ -80,35 +80,14 @@ export default ((opts?: Partial<Options>) => {
       (entry) => entry.text.trim().length > 0 && entry.slug.trim().length > 0,
     )
     const groups = groupTocEntries(filteredToc)
+    const tocTitle = cfg.locale === "ru-RU" ? "Содержание" : i18n(cfg.locale).components.tableOfContents.title
 
     return (
       <div class={classNames(displayClass, "toc")}>
-        <button
-          type="button"
-          class={fileData.collapseToc ? "collapsed toc-header" : "toc-header"}
-          aria-controls={id}
-          aria-expanded={!fileData.collapseToc}
-        >
-          <h3>{i18n(cfg.locale).components.tableOfContents.title}</h3>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="fold"
-          >
-            <polyline points="6 9 12 15 18 9"></polyline>
-          </svg>
-        </button>
-        <OverflowList
-          id={id}
-          class={fileData.collapseToc ? "collapsed toc-content" : "toc-content"}
-        >
+        <div class="toc-header">
+          <h3>{tocTitle}</h3>
+        </div>
+        <OverflowList id={id} class="toc-content">
           {groups.map((group, index) => {
             const hasChildren = group.children.length > 0
             const expandedByDefault = index === 0
@@ -184,11 +163,12 @@ export default ((opts?: Partial<Options>) => {
     if (!fileData.toc) {
       return null
     }
+    const tocTitle = cfg.locale === "ru-RU" ? "Содержание" : i18n(cfg.locale).components.tableOfContents.title
 
     return (
-      <details class="toc" open={!fileData.collapseToc}>
+      <details class="toc" open>
         <summary>
-          <h3>{i18n(cfg.locale).components.tableOfContents.title}</h3>
+          <h3>{tocTitle}</h3>
         </summary>
         <ul>
           {fileData.toc.map((tocEntry) => (
