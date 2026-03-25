@@ -3,87 +3,127 @@
 
 @media all and not ($mobile) {
   .page > #quartz-body > .left.sidebar {
-    --toc-drawer-left: max(0.75rem, calc((100vw - 1500px) / 2 + 0.75rem));
-    --toc-drawer-width: min(20rem, calc(100vw - 5rem));
+    min-width: 0;
+    gap: 0;
+    padding: 0;
+    overflow: visible;
+    background: color-mix(in srgb, var(--light) 96%, white);
+    border-right: 1px solid color-mix(in srgb, var(--lightgray) 85%, transparent);
+    transition:
+      background-color 0.22s ease,
+      border-color 0.22s ease;
+  }
+
+  .page > #quartz-body.toc-sidebar-collapsed > .left.sidebar {
+    background: transparent;
+    border-right-color: transparent;
   }
 
   .page > #quartz-body > .left.sidebar > .toc-drawer-toggle.desktop-only {
-    position: fixed;
-    top: 6.8rem;
-    left: var(--toc-drawer-left);
-    width: 2.75rem;
-    height: 2.75rem;
+    position: absolute;
+    top: calc(#{$topSpacing} + 0.85rem);
+    right: -0.95rem;
+    width: 1.9rem;
+    height: 3rem;
     padding: 0;
     border: 1px solid var(--lightgray);
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--light) 90%, transparent);
+    border-left: none;
+    border-radius: 0 999px 999px 0;
+    background: color-mix(in srgb, var(--light) 96%, white);
     color: var(--dark);
-    box-shadow: 0 10px 30px color-mix(in srgb, var(--dark) 10%, transparent);
+    box-shadow: 0 10px 26px color-mix(in srgb, var(--dark) 12%, transparent);
     backdrop-filter: blur(10px);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 3;
+    z-index: 4;
     transition:
       background-color 0.2s ease,
       border-color 0.2s ease,
       color 0.2s ease,
-      transform 0.18s ease,
-      left 0.18s ease;
+      box-shadow 0.2s ease,
+      transform 0.18s ease;
   }
 
   .page > #quartz-body > .left.sidebar > .toc-drawer-toggle.desktop-only:hover {
     background: var(--highlight);
     border-color: var(--secondary);
     color: var(--secondary);
+    box-shadow: 0 14px 30px color-mix(in srgb, var(--dark) 16%, transparent);
+  }
+
+  .page > #quartz-body > .left.sidebar > .toc-drawer-toggle.desktop-only:focus-visible {
+    outline: 2px solid var(--secondary);
+    outline-offset: 2px;
   }
 
   .page > #quartz-body > .left.sidebar > .toc-drawer-toggle.desktop-only .toc-drawer-toggle-icon {
     transition: transform 0.18s ease;
   }
 
-  .page > #quartz-body > .left.sidebar.toc-open > .toc-drawer-toggle.desktop-only .toc-drawer-toggle-icon {
+  .page > #quartz-body > .left.sidebar:not(.toc-collapsed) > .toc-drawer-toggle.desktop-only .toc-drawer-toggle-icon {
     transform: rotate(180deg);
   }
 
   .page > #quartz-body > .left.sidebar > .toc.desktop-only {
-    position: fixed;
-    top: 6rem;
-    left: var(--toc-drawer-left);
-    width: var(--toc-drawer-width);
-    overflow: visible;
-    transform: translateX(calc(-100% - 0.75rem));
-    opacity: 0;
-    pointer-events: none;
-    z-index: 2;
+    flex: 1 1 auto;
+    min-height: 0;
+    margin-top: calc(#{$topSpacing} - 0.15rem);
+    padding: 0.35rem 1rem 1.5rem 1.35rem;
+    overflow: hidden;
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
     transition:
       transform 0.18s ease,
       opacity 0.18s ease;
-    will-change: transform, opacity;
   }
 
-  .page > #quartz-body > .left.sidebar.toc-open > .toc-drawer-toggle.desktop-only {
-    left: calc(var(--toc-drawer-left) + var(--toc-drawer-width) - 1.375rem);
+  .page > #quartz-body > .left.sidebar.toc-collapsed > .toc.desktop-only {
+    opacity: 0;
+    transform: translateX(-0.85rem);
+    pointer-events: none;
   }
 
-  .page > #quartz-body > .left.sidebar.toc-open > .toc.desktop-only {
-    transform: translateX(0);
-    opacity: 1;
-    pointer-events: auto;
+  .page > #quartz-body > .left.sidebar > .toc.desktop-only .toc-header {
+    padding-left: 0;
+    margin-bottom: 0.65rem;
   }
 
   .page > #quartz-body > .left.sidebar > .toc.desktop-only ul.toc-content.overflow {
-    max-height: calc(100vh - 10rem);
-    overflow-y: visible;
+    flex: 1 1 auto;
+    max-height: none;
+    overflow-y: auto;
     overflow-x: hidden;
-    padding-right: 0.45rem;
+    padding-right: 0.55rem;
+    scrollbar-gutter: stable;
   }
 
   .page > #quartz-body > .left.sidebar > .toc.desktop-only.toc-scrollable ul.toc-content.overflow {
-    overflow-y: auto;
     padding-right: 0.8rem;
-    scrollbar-gutter: stable;
+  }
+}
+
+@media all and ($desktop) {
+  .page > #quartz-body {
+    grid-template-columns: #{$sidePanelWidth} minmax(0, 1fr) #{$sidePanelWidth};
+    transition: grid-template-columns 0.22s ease;
+  }
+
+  .page > #quartz-body.toc-sidebar-collapsed {
+    grid-template-columns: 3.25rem minmax(0, 1fr) #{$sidePanelWidth};
+  }
+}
+
+@media all and ($tablet) {
+  .page > #quartz-body {
+    grid-template-columns: #{$sidePanelWidth} minmax(0, 1fr);
+    transition: grid-template-columns 0.22s ease;
+  }
+
+  .page > #quartz-body.toc-sidebar-collapsed {
+    grid-template-columns: 3.25rem minmax(0, 1fr);
   }
 }
 
