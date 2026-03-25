@@ -34,6 +34,11 @@ function setTocGroupExpanded(group: Element, expanded: boolean) {
   toggle.classList.toggle("collapsed", !expanded)
   toggle.setAttribute("aria-expanded", expanded ? "true" : "false")
   content.classList.toggle("collapsed", !expanded)
+
+  const toc = group.closest(".toc")
+  if (toc) {
+    updateTocOverflow(toc)
+  }
 }
 
 function updateGroupHighlight(group: Element) {
@@ -90,10 +95,6 @@ function setupToc() {
     const resizeObserver = new ResizeObserver(updateOverflow)
     resizeObserver.observe(toc)
     window.addCleanup(() => resizeObserver.disconnect())
-
-    const mutationObserver = new MutationObserver(updateOverflow)
-    mutationObserver.observe(toc, { attributes: true, childList: true, subtree: true })
-    window.addCleanup(() => mutationObserver.disconnect())
 
     window.addEventListener("resize", updateOverflow)
     window.addCleanup(() => window.removeEventListener("resize", updateOverflow))
