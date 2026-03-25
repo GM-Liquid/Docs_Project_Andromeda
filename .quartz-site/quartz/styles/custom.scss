@@ -1,6 +1,42 @@
 @use "./variables.scss" as *;
 @use "./base.scss";
 
+@media all and ($desktop) {
+  .page > #quartz-body > .left.sidebar:has(> .toc) {
+    overflow: hidden;
+  }
+
+  .page > #quartz-body > .left.sidebar:has(> .toc) > .toc {
+    transform: translateX(calc(-100% - 0.75rem));
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      transform 0.18s ease,
+      opacity 0.18s ease;
+    will-change: transform, opacity;
+  }
+
+  .page > #quartz-body > .left.sidebar:has(> .toc):hover > .toc,
+  .page > #quartz-body > .left.sidebar:has(> .toc):focus-within > .toc {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .page > #quartz-body > .left.sidebar:has(> .toc) > .toc ul.toc-content.overflow {
+    max-height: calc(100vh - 10rem);
+    overflow-y: visible;
+    overflow-x: hidden;
+    padding-right: 0.45rem;
+  }
+
+  .page > #quartz-body > .left.sidebar:has(> .toc) > .toc.toc-scrollable ul.toc-content.overflow {
+    overflow-y: auto;
+    padding-right: 0.8rem;
+    scrollbar-gutter: stable;
+  }
+}
+
 @media all and ($mobile) {
   .page > #quartz-body > .left.sidebar {
     display: none;
