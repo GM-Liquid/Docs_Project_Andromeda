@@ -1,7 +1,46 @@
 @use "./variables.scss" as *;
 @use "./base.scss";
 
-@media all and ($desktop) {
+@media all and not ($mobile) {
+  .page > #quartz-body > .left.sidebar > .toc-drawer-toggle.desktop-only {
+    position: absolute;
+    top: 6.8rem;
+    right: 0.75rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 1px solid var(--lightgray);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--light) 90%, transparent);
+    color: var(--dark);
+    box-shadow: 0 10px 30px color-mix(in srgb, var(--dark) 10%, transparent);
+    backdrop-filter: blur(10px);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 3;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      color 0.2s ease,
+      transform 0.18s ease;
+  }
+
+  .page > #quartz-body > .left.sidebar > .toc-drawer-toggle.desktop-only:hover {
+    background: var(--highlight);
+    border-color: var(--secondary);
+    color: var(--secondary);
+  }
+
+  .page > #quartz-body > .left.sidebar > .toc-drawer-toggle.desktop-only .toc-drawer-toggle-icon {
+    transition: transform 0.18s ease;
+  }
+
+  .page > #quartz-body > .left.sidebar.toc-open > .toc-drawer-toggle.desktop-only .toc-drawer-toggle-icon {
+    transform: rotate(180deg);
+  }
+
   .page > #quartz-body > .left.sidebar > .toc.desktop-only {
     width: 100%;
     overflow: hidden;
@@ -14,8 +53,7 @@
     will-change: transform, opacity;
   }
 
-  .page > #quartz-body > .left.sidebar:hover > .toc.desktop-only,
-  .page > #quartz-body > .left.sidebar:focus-within > .toc.desktop-only {
+  .page > #quartz-body > .left.sidebar.toc-open > .toc.desktop-only {
     transform: translateX(0);
     opacity: 1;
     pointer-events: auto;

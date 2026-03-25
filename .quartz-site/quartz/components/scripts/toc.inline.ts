@@ -25,6 +25,30 @@ const observer = new IntersectionObserver((entries) => {
   }
 })
 
+function updateTocDrawerButton(button: HTMLElement, expanded: boolean) {
+  const label = expanded ? "Скрыть содержание" : "Показать содержание"
+  button.setAttribute("aria-expanded", expanded ? "true" : "false")
+  button.setAttribute("aria-label", label)
+  button.setAttribute("title", label)
+}
+
+function setTocDrawerExpanded(sidebar: Element, expanded: boolean) {
+  sidebar.classList.toggle("toc-open", expanded)
+
+  const button = sidebar.querySelector(".toc-drawer-toggle")
+  if (button instanceof HTMLElement) {
+    updateTocDrawerButton(button, expanded)
+  }
+}
+
+function toggleTocDrawer(this: HTMLElement) {
+  const sidebar = this.closest(".left.sidebar")
+  if (!sidebar) return
+
+  const expanded = !sidebar.classList.contains("toc-open")
+  setTocDrawerExpanded(sidebar, expanded)
+}
+
 function setTocGroupExpanded(group: Element, expanded: boolean) {
   const toggle = group.querySelector(".toc-group-toggle")
   const content = group.querySelector(".toc-group-items")
@@ -82,6 +106,16 @@ function updateTocOverflow(toc: Element) {
 }
 
 function setupToc() {
+  const desktopSidebar = document.querySelector(".left.sidebar")
+  const drawerToggle = desktopSidebar?.querySelector(".toc-drawer-toggle")
+  const desktopToc = desktopSidebar?.querySelector(".toc.desktop-only")
+
+  if (desktopSidebar && drawerToggle && desktopToc) {
+    setTocDrawerExpanded(desktopSidebar, false)
+    drawerToggle.addEventListener("click", toggleTocDrawer)
+    window.addCleanup(() => drawerToggle.removeEventListener("click", toggleTocDrawer))
+  }
+
   for (const toc of document.getElementsByClassName("toc")) {
     const groupToggles = toc.querySelectorAll(".toc-group-toggle")
     groupToggles.forEach((toggle) => {

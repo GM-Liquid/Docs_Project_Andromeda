@@ -22,6 +22,7 @@ export const defaultContentPageLayout: PageLayout = {
     Component.MobileOnly(Component.TableOfContents()),
   ],
   left: [
+    Component.DesktopOnly(Component.TocDrawerToggle()),
     Component.DesktopOnly(Component.TableOfContents()),
   ],
   right: [

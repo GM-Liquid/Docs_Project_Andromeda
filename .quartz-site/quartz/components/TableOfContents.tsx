@@ -82,8 +82,10 @@ export default ((opts?: Partial<Options>) => {
     const groups = groupTocEntries(filteredToc)
     const tocTitle = cfg.locale === "ru-RU" ? "Содержание" : i18n(cfg.locale).components.tableOfContents.title
 
+    const tocId = displayClass === "desktop-only" ? "desktop-toc-drawer" : undefined
+
     return (
-      <div class={classNames(displayClass, "toc")}>
+      <div id={tocId} class={classNames(displayClass, "toc")}>
         <div class="toc-header">
           <h3>{tocTitle}</h3>
         </div>
