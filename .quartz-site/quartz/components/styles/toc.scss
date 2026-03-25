@@ -5,6 +5,7 @@
   flex-direction: column;
   overflow-y: hidden;
   flex: 0 0.5 auto;
+  max-height: 66.666vh;
 }
 
 .toc-header {
@@ -24,7 +25,7 @@ ul.toc-content.overflow {
   position: relative;
   margin: 0;
   padding: 0;
-  max-height: calc(100% - 1.5rem);
+  max-height: calc(66.666vh - 1.5rem);
   overscroll-behavior: contain;
   list-style: none;
 

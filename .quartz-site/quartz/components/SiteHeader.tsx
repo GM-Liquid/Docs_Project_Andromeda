@@ -8,33 +8,26 @@ const ThemeToggle = Darkmode()
 
 const styles = `
 .site-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+  position: relative;
+  min-height: 1.25rem;
   padding-bottom: 0.85rem;
   border-bottom: 1px solid var(--lightgray);
 }
 
-.site-header-title {
-  font-family: var(--titleFont);
-  font-size: 0.95rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  line-height: 1.2;
-  color: var(--dark);
-}
-
-.site-header-title:hover {
-  color: var(--secondary);
-}
-
-.site-header-actions {
-  display: flex;
+.site-header-shell {
+  position: fixed;
+  top: 1rem;
+  right: clamp(1rem, 4vw, 2.5rem);
+  z-index: 30;
+  display: inline-flex;
   align-items: center;
-  justify-content: flex-end;
-  flex: 0 0 auto;
+  gap: 0.75rem;
+  padding: 0.35rem 0.45rem 0.35rem 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--lightgray) 88%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--light) 90%, transparent);
+  box-shadow: 0 10px 30px color-mix(in srgb, var(--dark) 10%, transparent);
+  backdrop-filter: blur(10px);
 }
 
 .site-header .darkmode {
@@ -62,13 +55,32 @@ const styles = `
   left: calc(50% - 0.5rem);
 }
 
-.site-header + .article-title {
-  margin-top: 1.25rem;
+.site-header-title {
+  font-family: var(--titleFont);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  color: var(--dark);
+  white-space: nowrap;
+}
+
+.site-header-title:hover {
+  color: var(--secondary);
 }
 
 @media all and (max-width: 800px) {
   .site-header {
     padding-bottom: 0.7rem;
+    min-height: 1rem;
+  }
+
+  .site-header-shell {
+    top: 0.75rem;
+    right: 0.75rem;
+    gap: 0.55rem;
+    padding-left: 0.7rem;
   }
 
   .site-header-title {
@@ -85,11 +97,13 @@ const SiteHeader: QuartzComponent = (props: QuartzComponentProps) => {
 
   return (
     <div class="site-header">
-      <a class="site-header-title" href={baseDir}>
-        {title}
-      </a>
-      <div class="site-header-actions">
-        <ThemeToggle {...props} />
+      <div class="site-header-shell">
+        <a class="site-header-title" href={baseDir}>
+          {title}
+        </a>
+        <div class="site-header-actions">
+          <ThemeToggle {...props} />
+        </div>
       </div>
     </div>
   )
