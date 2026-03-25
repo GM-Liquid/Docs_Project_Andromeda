@@ -64,6 +64,18 @@ function expandGroupForHash() {
   updateGroupHighlight(group)
 }
 
+function updateTocOverflow(toc: Element) {
+  const content = toc.querySelector(".toc-content.overflow")
+  if (!(content instanceof HTMLElement)) return
+
+  const isOverflowing = content.scrollHeight > content.clientHeight + 1
+  toc.classList.toggle("toc-scrollable", isOverflowing)
+
+  if (!isOverflowing) {
+    content.classList.remove("gradient-active")
+  }
+}
+
 function setupToc() {
   for (const toc of document.getElementsByClassName("toc")) {
     const groupToggles = toc.querySelectorAll(".toc-group-toggle")
@@ -71,9 +83,27 @@ function setupToc() {
       toggle.addEventListener("click", toggleTocGroup)
       window.addCleanup(() => toggle.removeEventListener("click", toggleTocGroup))
     })
+
+    const updateOverflow = () => updateTocOverflow(toc)
+    updateOverflow()
+
+    const resizeObserver = new ResizeObserver(updateOverflow)
+    resizeObserver.observe(toc)
+    window.addCleanup(() => resizeObserver.disconnect())
+
+    const mutationObserver = new MutationObserver(updateOverflow)
+    mutationObserver.observe(toc, { attributes: true, childList: true, subtree: true })
+    window.addCleanup(() => mutationObserver.disconnect())
+
+    window.addEventListener("resize", updateOverflow)
+    window.addCleanup(() => window.removeEventListener("resize", updateOverflow))
   }
 
   expandGroupForHash()
+
+  for (const toc of document.getElementsByClassName("toc")) {
+    updateTocOverflow(toc)
+  }
 }
 
 document.addEventListener("nav", () => {

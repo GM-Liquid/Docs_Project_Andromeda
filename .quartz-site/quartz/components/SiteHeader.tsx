@@ -3,22 +3,43 @@ import { concatenateResources } from "../util/resources"
 import { i18n } from "../i18n"
 import Darkmode from "./Darkmode"
 import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "./types"
+import { classNames } from "../util/lang"
 
 const ThemeToggle = Darkmode()
+
+interface Options {
+  variant: "sidebar" | "divider" | "inline"
+}
+
+const defaultOptions: Options = {
+  variant: "sidebar",
+}
 
 const styles = `
 .site-header {
   position: relative;
+}
+
+.site-header-divider {
   min-height: 1.25rem;
   padding-bottom: 0.85rem;
   border-bottom: 1px solid var(--lightgray);
 }
 
+.site-header-sidebar {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 0.1rem;
+}
+
+.site-header-inline {
+  display: flex;
+  justify-content: flex-end;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--lightgray);
+}
+
 .site-header-shell {
-  position: fixed;
-  top: 1rem;
-  right: clamp(1rem, 4vw, 2.5rem);
-  z-index: 30;
   display: inline-flex;
   align-items: center;
   gap: 0.75rem;
@@ -28,6 +49,10 @@ const styles = `
   background: color-mix(in srgb, var(--light) 90%, transparent);
   box-shadow: 0 10px 30px color-mix(in srgb, var(--dark) 10%, transparent);
   backdrop-filter: blur(10px);
+}
+
+.site-header-sidebar .site-header-shell {
+  margin-left: auto;
 }
 
 .site-header .darkmode {
@@ -71,14 +96,7 @@ const styles = `
 }
 
 @media all and (max-width: 800px) {
-  .site-header {
-    padding-bottom: 0.7rem;
-    min-height: 1rem;
-  }
-
   .site-header-shell {
-    top: 0.75rem;
-    right: 0.75rem;
     gap: 0.55rem;
     padding-left: 0.7rem;
   }
@@ -87,30 +105,42 @@ const styles = `
     font-size: 0.82rem;
     letter-spacing: 0.06em;
   }
+
+  .site-header-inline {
+    padding-bottom: 0.7rem;
+  }
 }
 `
 
-const SiteHeader: QuartzComponent = (props: QuartzComponentProps) => {
-  const { fileData, cfg } = props
-  const title = cfg?.pageTitle ?? i18n(cfg.locale).propertyDefaults.title
-  const baseDir = pathToRoot(fileData.slug!)
+export default ((opts?: Partial<Options>) => {
+  const variant = opts?.variant ?? defaultOptions.variant
 
-  return (
-    <div class="site-header">
-      <div class="site-header-shell">
-        <a class="site-header-title" href={baseDir}>
-          {title}
-        </a>
-        <div class="site-header-actions">
-          <ThemeToggle {...props} />
+  const SiteHeader: QuartzComponent = (props: QuartzComponentProps) => {
+    const { fileData, cfg, displayClass } = props
+    const title = cfg?.pageTitle ?? i18n(cfg.locale).propertyDefaults.title
+    const baseDir = pathToRoot(fileData.slug!)
+
+    if (variant === "divider") {
+      return <div class={classNames(displayClass, "site-header", "site-header-divider")} />
+    }
+
+    return (
+      <div class={classNames(displayClass, "site-header", `site-header-${variant}`)}>
+        <div class="site-header-shell">
+          <a class="site-header-title" href={baseDir}>
+            {title}
+          </a>
+          <div class="site-header-actions">
+            <ThemeToggle {...props} />
+          </div>
         </div>
       </div>
-    </div>
-  )
-}
+    )
+  }
 
-SiteHeader.css = concatenateResources(styles, ThemeToggle.css)
-SiteHeader.beforeDOMLoaded = ThemeToggle.beforeDOMLoaded
-SiteHeader.afterDOMLoaded = ThemeToggle.afterDOMLoaded
+  SiteHeader.css = concatenateResources(styles, ThemeToggle.css)
+  SiteHeader.beforeDOMLoaded = ThemeToggle.beforeDOMLoaded
+  SiteHeader.afterDOMLoaded = ThemeToggle.afterDOMLoaded
 
-export default (() => SiteHeader) satisfies QuartzComponentConstructor
+  return SiteHeader
+}) satisfies QuartzComponentConstructor

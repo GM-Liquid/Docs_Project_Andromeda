@@ -16,11 +16,17 @@ export const sharedPageComponents: SharedLayout = {
 
 // components for pages that display a single page (e.g. a single note)
 export const defaultContentPageLayout: PageLayout = {
-  beforeBody: [SiteHeader(), Component.MobileOnly(Component.TableOfContents())],
+  beforeBody: [
+    Component.MobileOnly(SiteHeader({ variant: "inline" })),
+    Component.DesktopOnly(SiteHeader({ variant: "divider" })),
+    Component.MobileOnly(Component.TableOfContents()),
+  ],
   left: [
     Component.DesktopOnly(Component.TableOfContents()),
   ],
-  right: [],
+  right: [
+    Component.DesktopOnly(SiteHeader({ variant: "sidebar" })),
+  ],
 }
 
 // components for pages that display lists of pages  (e.g. tags or folders)
