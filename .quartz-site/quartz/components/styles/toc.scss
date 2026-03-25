@@ -58,6 +58,65 @@ ul.toc-content.overflow {
     }
   }
 
+  & > .toc-group {
+    margin-bottom: 0.15rem;
+  }
+
+  & .toc-group-heading {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.2rem;
+  }
+
+  & .toc-group-toggle {
+    background: transparent;
+    border: none;
+    padding: 0.15rem 0 0 0;
+    color: var(--dark);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+
+    & .fold {
+      transition: transform 0.2s ease;
+      opacity: 0.8;
+    }
+
+    &.collapsed .fold {
+      transform: rotateZ(-90deg);
+    }
+  }
+
+  & .toc-group-spacer {
+    width: 18px;
+    flex: 0 0 18px;
+  }
+
+  & .toc-group-link {
+    color: var(--dark);
+    font-weight: 600;
+    opacity: 0.7;
+    transition:
+      0.5s ease opacity,
+      0.3s ease color;
+
+    &.in-view {
+      opacity: 1;
+    }
+  }
+
+  & .toc-group-items {
+    list-style: none;
+    margin: 0.15rem 0 0.4rem;
+    padding: 0;
+  }
+
+  & .toc-group-items.collapsed {
+    display: none;
+  }
+
   @for $i from 0 through 6 {
     & .depth-#{$i} {
       padding-left: calc(1rem * #{$i});
