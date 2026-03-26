@@ -47,10 +47,30 @@ function openRulebookItem(item: HTMLElement) {
   item.setAttribute("data-open", "true");
 }
 
+function closeAllRulebookItems(nav: ParentNode) {
+  nav
+    .querySelectorAll(".rulebook-nav-item[data-open='true']")
+    .forEach((item) => {
+      closeRulebookItem(item as HTMLElement);
+    });
+}
+
 function setupRulebookNav() {
   const navs = document.querySelectorAll(".rulebook-nav");
 
   navs.forEach((nav) => {
+    const onClick = (event: Event) => {
+      const target = event.target as Element | null;
+      if (!target?.closest("a")) {
+        return;
+      }
+
+      closeAllRulebookItems(nav);
+    };
+
+    nav.addEventListener("click", onClick);
+    window.addCleanup(() => nav.removeEventListener("click", onClick));
+
     const flyoutItems = nav.querySelectorAll(
       ".rulebook-nav-item[data-has-flyout='true']",
     ) as NodeListOf<HTMLElement>;
