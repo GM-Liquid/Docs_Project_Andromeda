@@ -86,50 +86,16 @@ function renderHomePage(chaptersToRender, pageDate) {
   const body = [
     "Книга правил публикуется как цепочка отдельных страниц. Основные разделы доступны в левой панели.",
     "",
-    "Начать удобнее с оглавления книги или сразу с нужной главы.",
+    "Начать удобнее сразу с нужной главы.",
     "",
     "## Читать по порядку",
     "",
     chapterLinks,
-    "",
-    "## Оглавление",
-    "",
-    "- [Книга правил v0.4](rulebook/)",
   ].join("\n");
 
   return withFrontmatter(
     {
       title: "Проект Андромеда",
-      created: pageDate,
-      modified: pageDate,
-    },
-    body,
-  );
-}
-
-function renderRulebookIndex(chaptersToRender, pageDate) {
-  const chapterLinks = chaptersToRender
-    .map(
-      (chapter) =>
-        `1. [${chapter.title}](${chapter.target.replace(/\.md$/, "")})`,
-    )
-    .join("\n");
-
-  const body = [
-    "Это публикационная версия книги правил, разложенная по отдельным страницам в порядке чтения.",
-    "",
-    "## Порядок чтения",
-    "",
-    chapterLinks,
-    "",
-    "## Дальше",
-    "",
-    "Следующие разделы будут добавляться по мере готовности книги.",
-  ].join("\n");
-
-  return withFrontmatter(
-    {
-      title: "Книга правил v0.4",
       created: pageDate,
       modified: pageDate,
     },
@@ -174,18 +140,12 @@ export async function syncBook() {
     renderHomePage(renderedChapters, pageDate),
     "utf8",
   );
-  await writeFile(
-    resolve(rulebookDir, "index.md"),
-    renderRulebookIndex(renderedChapters, pageDate),
-    "utf8",
-  );
 
   return {
     sourceDir,
     contentDir,
     generatedFiles: [
       resolve(contentDir, "index.md"),
-      resolve(rulebookDir, "index.md"),
       ...renderedChapters.map((chapter) =>
         resolve(rulebookDir, chapter.target),
       ),

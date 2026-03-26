@@ -69,12 +69,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Книга правил v0.4/Способности и снаряжение.md",
+                "file": "AGENTS.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Способности и снаряжение"
+              "title": "AGENTS"
             }
           }
         ],
@@ -246,6 +246,7 @@
   },
   "active": "6b5ef77597a27352",
   "lastOpenFiles": [
+    "Книга правил v0.4/Способности и снаряжение.md",
     "Microsoft/Windows/PowerShell/ModuleAnalysisCache",
     "Microsoft/Windows/PowerShell",
     "Microsoft/Windows",
@@ -270,7 +271,6 @@
     "Документация",
     "Книга правил v0.4/README.md",
     "Книга правил v0.4/Проект Андромеда v0.4.md",
-    "Книга правил v0.4/Способности и снаряжение.md",
     "Документация/Общие правила/Ранги.md",
     "Документация/Общие правила/Сцены.md",
     "cdp-log.txt",
