@@ -1,7 +1,28 @@
 const desktopRulebookNav = window.matchMedia("(min-width: 1200px)");
+const rulebookCloseTimers = new WeakMap<HTMLElement, number>();
+
+function cancelCloseRulebookItem(item: HTMLElement) {
+  const timerId = rulebookCloseTimers.get(item);
+  if (timerId !== undefined) {
+    window.clearTimeout(timerId);
+    rulebookCloseTimers.delete(item);
+  }
+}
 
 function closeRulebookItem(item: HTMLElement) {
+  cancelCloseRulebookItem(item);
   item.removeAttribute("data-open");
+}
+
+function scheduleCloseRulebookItem(item: HTMLElement, delay = 160) {
+  cancelCloseRulebookItem(item);
+
+  const timerId = window.setTimeout(() => {
+    rulebookCloseTimers.delete(item);
+    closeRulebookItem(item);
+  }, delay);
+
+  rulebookCloseTimers.set(item, timerId);
 }
 
 function openRulebookItem(item: HTMLElement) {
@@ -22,6 +43,7 @@ function openRulebookItem(item: HTMLElement) {
       }
     });
 
+  cancelCloseRulebookItem(item);
   item.setAttribute("data-open", "true");
 }
 
@@ -34,8 +56,11 @@ function setupRulebookNav() {
     ) as NodeListOf<HTMLElement>;
 
     flyoutItems.forEach((item) => {
+      const flyout = item.querySelector(
+        ".rulebook-nav-flyout",
+      ) as HTMLElement | null;
       const onMouseEnter = () => openRulebookItem(item);
-      const onMouseLeave = () => closeRulebookItem(item);
+      const onMouseLeave = () => scheduleCloseRulebookItem(item);
       const onFocusIn = () => openRulebookItem(item);
       const onFocusOut = (event: FocusEvent) => {
         const nextTarget = event.relatedTarget as Node | null;
@@ -56,12 +81,16 @@ function setupRulebookNav() {
         ) as HTMLElement | null;
         link?.focus();
       };
+      const onFlyoutMouseEnter = () => cancelCloseRulebookItem(item);
+      const onFlyoutMouseLeave = () => scheduleCloseRulebookItem(item);
 
       item.addEventListener("mouseenter", onMouseEnter);
       item.addEventListener("mouseleave", onMouseLeave);
       item.addEventListener("focusin", onFocusIn);
       item.addEventListener("focusout", onFocusOut);
       item.addEventListener("keydown", onKeyDown);
+      flyout?.addEventListener("mouseenter", onFlyoutMouseEnter);
+      flyout?.addEventListener("mouseleave", onFlyoutMouseLeave);
 
       window.addCleanup(() =>
         item.removeEventListener("mouseenter", onMouseEnter),
@@ -72,6 +101,12 @@ function setupRulebookNav() {
       window.addCleanup(() => item.removeEventListener("focusin", onFocusIn));
       window.addCleanup(() => item.removeEventListener("focusout", onFocusOut));
       window.addCleanup(() => item.removeEventListener("keydown", onKeyDown));
+      window.addCleanup(() =>
+        flyout?.removeEventListener("mouseenter", onFlyoutMouseEnter),
+      );
+      window.addCleanup(() =>
+        flyout?.removeEventListener("mouseleave", onFlyoutMouseLeave),
+      );
     });
   });
 
