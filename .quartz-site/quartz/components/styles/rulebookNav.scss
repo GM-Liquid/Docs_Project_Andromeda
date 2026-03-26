@@ -46,9 +46,7 @@
     box-shadow: inset 0 0 0 1px rgba(98, 176, 255, 0.28);
   }
 
-  &[data-open="true"] > .rulebook-nav-flyout,
-  &:hover > .rulebook-nav-flyout,
-  &:focus-within > .rulebook-nav-flyout {
+  &[data-open="true"] > .rulebook-nav-flyout {
     opacity: 1;
     visibility: visible;
     transform: translateX(0);
