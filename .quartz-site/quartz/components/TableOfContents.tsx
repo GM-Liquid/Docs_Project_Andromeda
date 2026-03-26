@@ -17,55 +17,10 @@ const defaultOptions: Options = {
   layout: "modern",
 }
 
-type TocEntry = NonNullable<QuartzComponentProps["fileData"]["toc"]>[number]
-
-interface TocGroup {
-  heading: TocEntry
-  children: TocEntry[]
-}
-
-function isChapterHeading(text: string) {
-  return /^\u0433\u043B\u0430\u0432\u0430(?:\s|:|$)/ui.test(text.trim())
-}
-
-function groupTocEntries(toc: TocEntry[]): TocGroup[] {
-  const groups: TocGroup[] = []
-  let currentGroup: TocGroup | undefined
-  const hasChapterGroups = toc.some((entry) => entry.depth === 0 && isChapterHeading(entry.text))
-
-  for (const entry of toc) {
-    const startsNewGroup =
-      !currentGroup ||
-      (hasChapterGroups ? entry.depth === 0 && isChapterHeading(entry.text) : entry.depth === 0)
-
-    if (startsNewGroup) {
-      currentGroup = {
-        heading: entry,
-        children: [],
-      }
-      groups.push(currentGroup)
-      continue
-    }
-
-    if (!currentGroup) {
-      continue
-    }
-
-    currentGroup.children.push(entry)
-  }
-
-  return groups
-}
-
-function joinClasses(...classes: Array<string | false | undefined>) {
-  return classes.filter(Boolean).join(" ")
-}
-
 let numTocs = 0
 export default ((opts?: Partial<Options>) => {
   const layout = opts?.layout ?? defaultOptions.layout
   const { OverflowList, overflowListAfterDOMLoaded } = OverflowListFactory()
-
   const TableOfContents: QuartzComponent = ({
     fileData,
     displayClass,
@@ -76,83 +31,41 @@ export default ((opts?: Partial<Options>) => {
     }
 
     const id = `toc-${numTocs++}`
-    const filteredToc = fileData.toc.filter(
-      (entry) => entry.text.trim().length > 0 && entry.slug.trim().length > 0,
-    )
-    const groups = groupTocEntries(filteredToc)
-    const tocTitle = cfg.locale === "ru-RU" ? "Содержание" : i18n(cfg.locale).components.tableOfContents.title
-
-    const tocId = displayClass === "desktop-only" ? "desktop-toc-drawer" : undefined
-
     return (
-      <div id={tocId} class={classNames(displayClass, "toc")}>
-        <div class="toc-header">
-          <h3>{tocTitle}</h3>
-        </div>
-        <OverflowList id={id} class="toc-content">
-          {groups.map((group, index) => {
-            const hasChildren = group.children.length > 0
-            const expandedByDefault = index === 0
-            const groupId = `${id}-group-${index}`
-
-            return (
-              <li
-                key={`${group.heading.slug}-${index}`}
-                class={joinClasses("toc-group", hasChildren && !expandedByDefault && "collapsed")}
-              >
-                <div class="toc-group-heading">
-                  {hasChildren ? (
-                    <button
-                      type="button"
-                      class={joinClasses(
-                        "toc-group-toggle",
-                        !expandedByDefault && "collapsed",
-                      )}
-                      aria-controls={groupId}
-                      aria-expanded={expandedByDefault}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        class="fold"
-                      >
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                      </svg>
-                    </button>
-                  ) : (
-                    <span class="toc-group-spacer" aria-hidden="true" />
-                  )}
-                  <a href={`#${group.heading.slug}`} data-for={group.heading.slug} class="toc-group-link">
-                    {group.heading.text}
-                  </a>
-                </div>
-                {hasChildren && (
-                  <ul
-                    id={groupId}
-                    class={joinClasses("toc-group-items", !expandedByDefault && "collapsed")}
-                  >
-                    {group.children.map((tocEntry) => (
-                      <li
-                        key={`${groupId}-${tocEntry.slug}`}
-                        class={`depth-${Math.max(0, tocEntry.depth - 1)}`}
-                      >
-                        <a href={`#${tocEntry.slug}`} data-for={tocEntry.slug}>
-                          {tocEntry.text}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </li>
-            )
-          })}
+      <div class={classNames(displayClass, "toc")}>
+        <button
+          type="button"
+          class={fileData.collapseToc ? "collapsed toc-header" : "toc-header"}
+          aria-controls={id}
+          aria-expanded={!fileData.collapseToc}
+        >
+          <h3>{i18n(cfg.locale).components.tableOfContents.title}</h3>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="fold"
+          >
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <OverflowList
+          id={id}
+          class={fileData.collapseToc ? "collapsed toc-content" : "toc-content"}
+        >
+          {fileData.toc.map((tocEntry) => (
+            <li key={tocEntry.slug} class={`depth-${tocEntry.depth}`}>
+              <a href={`#${tocEntry.slug}`} data-for={tocEntry.slug}>
+                {tocEntry.text}
+              </a>
+            </li>
+          ))}
         </OverflowList>
       </div>
     )
@@ -165,12 +78,10 @@ export default ((opts?: Partial<Options>) => {
     if (!fileData.toc) {
       return null
     }
-    const tocTitle = cfg.locale === "ru-RU" ? "Содержание" : i18n(cfg.locale).components.tableOfContents.title
-
     return (
-      <details class="toc" open>
+      <details class="toc" open={!fileData.collapseToc}>
         <summary>
-          <h3>{tocTitle}</h3>
+          <h3>{i18n(cfg.locale).components.tableOfContents.title}</h3>
         </summary>
         <ul>
           {fileData.toc.map((tocEntry) => (
@@ -184,7 +95,6 @@ export default ((opts?: Partial<Options>) => {
       </details>
     )
   }
-
   LegacyTableOfContents.css = legacyStyle
 
   return layout === "modern" ? TableOfContents : LegacyTableOfContents

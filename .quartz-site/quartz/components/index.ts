@@ -10,7 +10,6 @@ import PageTitle from "./PageTitle"
 import ContentMeta from "./ContentMeta"
 import Spacer from "./Spacer"
 import TableOfContents from "./TableOfContents"
-import TocDrawerToggle from "./TocDrawerToggle"
 import Explorer from "./Explorer"
 import TagList from "./TagList"
 import Graph from "./Graph"
@@ -37,7 +36,6 @@ export {
   ContentMeta,
   Spacer,
   TableOfContents,
-  TocDrawerToggle,
   Explorer,
   TagList,
   Graph,

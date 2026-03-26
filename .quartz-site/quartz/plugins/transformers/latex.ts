@@ -17,10 +17,8 @@ interface Options {
   typstOptions: TypstOptions
 }
 
-// mathjax macros
-export type Args = boolean | number | string | null
 interface MacroType {
-  [key: string]: string | Args[]
+  [key: string]: string
 }
 
 export const Latex: QuartzTransformerPlugin<Partial<Options>> = (opts) => {
@@ -39,20 +37,11 @@ export const Latex: QuartzTransformerPlugin<Partial<Options>> = (opts) => {
         case "typst": {
           return [[rehypeTypst, opts?.typstOptions ?? {}]]
         }
-        default:
         case "mathjax": {
-          return [
-            [
-              rehypeMathjax,
-              {
-                ...(opts?.mathJaxOptions ?? {}),
-                tex: {
-                  ...(opts?.mathJaxOptions?.tex ?? {}),
-                  macros,
-                },
-              },
-            ],
-          ]
+          return [[rehypeMathjax, { macros, ...(opts?.mathJaxOptions ?? {}) }]]
+        }
+        default: {
+          return [[rehypeMathjax, { macros, ...(opts?.mathJaxOptions ?? {}) }]]
         }
       }
     },

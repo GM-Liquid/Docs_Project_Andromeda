@@ -8,7 +8,7 @@ import { syncBook } from "./sync-book.mjs"
 const scriptDir = dirname(fileURLToPath(import.meta.url))
 const siteRoot = resolve(scriptDir, "..")
 const repoRoot = resolve(siteRoot, "..")
-const sourcePath = resolve(repoRoot, "Книга правил", "Проект Андромеда v0.4.md")
+const sourceGlob = resolve(repoRoot, "Книга правил v0.4", "*.md")
 
 await syncBook()
 
@@ -18,13 +18,13 @@ const quartz = spawn(npxCommand, ["quartz", "build", "--serve"], {
   stdio: "inherit",
 })
 
-const watcher = chokidar.watch(sourcePath, {
+const watcher = chokidar.watch(sourceGlob, {
   ignoreInitial: true,
 })
 
-watcher.on("change", async () => {
+watcher.on("all", async () => {
   await syncBook()
-  console.log("Book source changed. Synced content/index.md.")
+  console.log("Rulebook source changed. Synced Quartz content pages.")
 })
 
 const shutdown = async (signal) => {

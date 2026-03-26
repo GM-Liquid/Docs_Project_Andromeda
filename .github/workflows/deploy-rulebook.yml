@@ -8,7 +8,7 @@ on:
     paths:
       - ".github/workflows/deploy-rulebook.yml"
       - ".quartz-site/**"
-      - "Книга правил/Проект Андромеда v0.4.md"
+      - "Книга правил v0.4/**"
   workflow_dispatch:
 
 permissions:

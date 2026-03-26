@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises"
+import { mkdir, readFile, rm, stat, writeFile } from "node:fs/promises"
 import { dirname, resolve } from "node:path"
 import { fileURLToPath } from "node:url"
 
@@ -6,32 +6,182 @@ const scriptDir = dirname(fileURLToPath(import.meta.url))
 const siteRoot = resolve(scriptDir, "..")
 const repoRoot = resolve(siteRoot, "..")
 
-const sourcePath = resolve(repoRoot, "Книга правил", "Проект Андромеда v0.4.md")
-const targetPath = resolve(siteRoot, "content", "index.md")
+const sourceDir = resolve(repoRoot, "Книга правил v0.4")
+const contentDir = resolve(siteRoot, "content")
+const rulebookDir = resolve(contentDir, "rulebook")
+
+const chapters = [
+  {
+    source: "Основные правила.md",
+    target: "01-osnovnye-pravila.md",
+    title: "Основные правила",
+  },
+  {
+    source: "Создание персонажа.md",
+    target: "02-sozdanie-personazha.md",
+    title: "Создание персонажа",
+  },
+  {
+    source: "Способности и снаряжение.md",
+    target: "03-sposobnosti-i-snaryazhenie.md",
+    title: "Способности и снаряжение",
+  },
+  {
+    source: "Бой.md",
+    target: "04-boy.md",
+    title: "Бой",
+  },
+  {
+    source: "Социальные сцены.md",
+    target: "05-socialnye-sceny.md",
+    title: "Социальные сцены",
+  },
+]
+
+function formatDate(date) {
+  const year = date.getFullYear()
+  const month = `${date.getMonth() + 1}`.padStart(2, "0")
+  const day = `${date.getDate()}`.padStart(2, "0")
+  return `${year}-${month}-${day}`
+}
+
+function withFrontmatter({ title, created, modified }, body) {
+  return [
+    "---",
+    `title: ${title}`,
+    `created: ${created}`,
+    `modified: ${modified}`,
+    "---",
+    "",
+    body.trimEnd(),
+    "",
+  ].join("\n")
+}
+
+function normalizeBody(body, title) {
+  const cleaned = body.replace(/^\uFEFF/, "").trim()
+
+  if (!cleaned) {
+    return "TODO: раздел пока в подготовке."
+  }
+
+  if (title === "Бой") {
+    return cleaned.replace(/\[Основные правила\]\(\)/g, "[Основные правила](01-osnovnye-pravila)")
+  }
+
+  return cleaned
+}
+
+function renderHomePage(chaptersToRender, pageDate) {
+  const chapterLinks = chaptersToRender
+    .map((chapter) => `1. [${chapter.title}](rulebook/${chapter.target.replace(/\.md$/, "")})`)
+    .join("\n")
+
+  const body = [
+    "Книга правил публикуется как набор отдельных страниц на стандартной навигации Quartz.",
+    "",
+    "Начать удобнее с оглавления книги или сразу с нужной главы.",
+    "",
+    "## Читать по порядку",
+    "",
+    chapterLinks,
+    "",
+    "## Оглавление",
+    "",
+    "- [Книга правил v0.4](rulebook/)",
+  ].join("\n")
+
+  return withFrontmatter(
+    {
+      title: "Проект Андромеда",
+      created: pageDate,
+      modified: pageDate,
+    },
+    body,
+  )
+}
+
+function renderRulebookIndex(chaptersToRender, pageDate) {
+  const chapterLinks = chaptersToRender
+    .map((chapter) => `1. [${chapter.title}](${chapter.target.replace(/\.md$/, "")})`)
+    .join("\n")
+
+  const body = [
+    "Это публикационная версия книги правил, разложенная по отдельным страницам в порядке чтения.",
+    "",
+    "## Порядок чтения",
+    "",
+    chapterLinks,
+    "",
+    "## Дальше",
+    "",
+    "Следующие разделы будут добавляться по мере готовности книги.",
+  ].join("\n")
+
+  return withFrontmatter(
+    {
+      title: "Книга правил v0.4",
+      created: pageDate,
+      modified: pageDate,
+    },
+    body,
+  )
+}
 
 export async function syncBook() {
-  const source = (await readFile(sourcePath, "utf8")).replace(/^\uFEFF/, "").trimEnd()
-  const generated = ["---", "title: Проект Андромеда", "---", "", source, ""].join("\n")
+  await mkdir(contentDir, { recursive: true })
+  await rm(rulebookDir, { recursive: true, force: true })
+  await mkdir(rulebookDir, { recursive: true })
 
-  await mkdir(dirname(targetPath), { recursive: true })
+  let latestTimestamp = 0
+  const renderedChapters = []
 
-  let current = ""
-  try {
-    current = await readFile(targetPath, "utf8")
-  } catch {
-    current = ""
-  }
+  for (const chapter of chapters) {
+    const sourcePath = resolve(sourceDir, chapter.source)
+    const targetPath = resolve(rulebookDir, chapter.target)
+    const source = await readFile(sourcePath, "utf8")
+    const sourceStats = await stat(sourcePath)
+    const modified = formatDate(sourceStats.mtime)
 
-  if (current !== generated) {
+    latestTimestamp = Math.max(latestTimestamp, sourceStats.mtimeMs)
+
+    const generated = withFrontmatter(
+      {
+        title: chapter.title,
+        created: modified,
+        modified,
+      },
+      normalizeBody(source, chapter.title),
+    )
+
     await writeFile(targetPath, generated, "utf8")
+    renderedChapters.push(chapter)
   }
 
-  return { sourcePath, targetPath }
+  const pageDate = formatDate(new Date(latestTimestamp || Date.now()))
+
+  await writeFile(resolve(contentDir, "index.md"), renderHomePage(renderedChapters, pageDate), "utf8")
+  await writeFile(
+    resolve(rulebookDir, "index.md"),
+    renderRulebookIndex(renderedChapters, pageDate),
+    "utf8",
+  )
+
+  return {
+    sourceDir,
+    contentDir,
+    generatedFiles: [
+      resolve(contentDir, "index.md"),
+      resolve(rulebookDir, "index.md"),
+      ...renderedChapters.map((chapter) => resolve(rulebookDir, chapter.target)),
+    ],
+  }
 }
 
 const isDirectRun = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)
 
 if (isDirectRun) {
-  const { sourcePath: source, targetPath: target } = await syncBook()
+  const { sourceDir: source, contentDir: target, generatedFiles } = await syncBook()
   console.log(`Synced ${source} -> ${target}`)
+  console.log(`Generated ${generatedFiles.length} files.`)
 }

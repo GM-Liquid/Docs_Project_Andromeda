@@ -3,29 +3,47 @@
 .toc {
   display: flex;
   flex-direction: column;
-  overflow: visible;
-  flex: 0 0 auto;
+  overflow-y: hidden;
+  min-height: 1.4rem;
+  flex: 0 0.5 auto;
+  &:has(button.toc-header.collapsed) {
+    flex: 0 1 1.4rem;
+  }
 }
 
-.toc-header {
-  padding-left: 1.35rem;
-  color: var(--darkgray);
+button.toc-header {
+  background-color: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  padding: 0;
+  color: var(--dark);
+  display: flex;
+  align-items: center;
 
   & h3 {
-    font-size: 0.9rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    font-size: 1rem;
+    display: inline-block;
     margin: 0;
+  }
+
+  & .fold {
+    margin-left: 0.5rem;
+    transition: transform 0.3s ease;
+    opacity: 0.8;
+  }
+
+  &.collapsed .fold {
+    transform: rotateZ(-90deg);
   }
 }
 
 ul.toc-content.overflow {
   list-style: none;
   position: relative;
-  margin: 0;
+  margin: 0.5rem 0;
   padding: 0;
-  max-height: calc(66.666vh - 1.5rem);
-  overflow-y: hidden;
+  max-height: calc(100% - 2rem);
   overscroll-behavior: contain;
   list-style: none;
 
@@ -40,72 +58,9 @@ ul.toc-content.overflow {
     }
   }
 
-  & > .toc-group {
-    margin-bottom: 0.15rem;
-  }
-
-  & .toc-group-heading {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.2rem;
-  }
-
-  & .toc-group-toggle {
-    background: transparent;
-    border: none;
-    padding: 0.15rem 0 0 0;
-    color: var(--dark);
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex: 0 0 auto;
-
-    & .fold {
-      transition: transform 0.2s ease;
-      opacity: 0.8;
-    }
-
-    &.collapsed .fold {
-      transform: rotateZ(-90deg);
-    }
-  }
-
-  & .toc-group-spacer {
-    width: 18px;
-    flex: 0 0 18px;
-  }
-
-  & .toc-group-link {
-    color: var(--dark);
-    font-weight: 600;
-    opacity: 0.7;
-    transition:
-      0.5s ease opacity,
-      0.3s ease color;
-
-    &.in-view {
-      opacity: 1;
-    }
-  }
-
-  & .toc-group-items {
-    list-style: none;
-    margin: 0.15rem 0 0.4rem;
-    padding: 0;
-  }
-
-  & .toc-group-items.collapsed {
-    display: none;
-  }
-
   @for $i from 0 through 6 {
     & .depth-#{$i} {
       padding-left: calc(1rem * #{$i});
     }
   }
-}
-
-.toc.toc-scrollable ul.toc-content.overflow {
-  overflow-y: auto;
 }
