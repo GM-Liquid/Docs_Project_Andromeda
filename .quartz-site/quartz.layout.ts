@@ -2,7 +2,8 @@ import { PageLayout, SharedLayout } from "./quartz/cfg";
 import * as Component from "./quartz/components";
 
 const isRulebookPage = (page: { fileData: { slug?: string } }) =>
-  page.fileData.slug?.startsWith("rulebook/") ?? false;
+  page.fileData.slug === "index" ||
+  (page.fileData.slug?.startsWith("rulebook/") ?? false);
 
 // components shared across all pages
 export const sharedPageComponents: SharedLayout = {

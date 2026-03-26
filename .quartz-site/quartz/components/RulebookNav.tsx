@@ -72,7 +72,7 @@ export default (() => {
     displayClass,
   }: QuartzComponentProps) => {
     const currentSlug = fileData.slug;
-    if (!currentSlug?.startsWith(rulebookPrefix)) {
+    if (currentSlug !== "index" && !currentSlug?.startsWith(rulebookPrefix)) {
       return null;
     }
 

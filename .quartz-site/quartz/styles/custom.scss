@@ -1,6 +1,7 @@
 @use "./base.scss";
 @use "./variables.scss" as *;
 
+body[data-slug="index"],
 body[data-slug^="rulebook/"] {
   .page > #quartz-body {
     @media all and ($desktop) {
